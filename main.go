@@ -71,28 +71,26 @@ func checkUrls(text string, prResultUrl string){
 }
 
 func recordUrlResults(prResultUrl string, reachable []string, unreachable []string){
-    body := "# URL reachability report"
+    body := "## URL reachability report"
     if len(reachable) > 0 {
-        body += "\n## The following URLs are **reachable**:\n"
+        body += "\n### The following URLs are **reachable**:\n"
         body += strings.Join(reachable,"\n")
     }
     if len(unreachable) > 0 {
-        body += "\n## The following URLs are **unreachable**:\n"
+        body += "\n### The following URLs are **not reachable**:\n"
         body += strings.Join(unreachable,"\n")
     }
     if len(reachable) == 0 && len(unreachable) == 0{
         body += "\nNo URLs found in PR description."
     }
-    log.Println(reachable)
-    log.Println(unreachable)
     jsonBody, err := json.Marshal(GithubComment{body})
-    if err != nil{
+    if err == nil{
         client := &http.Client{}
-        req, err := http.NewRequest("POST", prResultUrl, bytes.NewBuffer(jsonBody))
+        req, _ := http.NewRequest("POST", prResultUrl, bytes.NewBuffer(jsonBody))
         req.Header.Add("Authorization", "token "+os.Getenv("GITHUB_TOKEN"))
         resp, err := client.Do(req)
         defer resp.Body.Close()
-        if err == nil{
+        if err != nil{
             log.Println(resp)
         }
     }
@@ -117,10 +115,3 @@ func main() {
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-// todo items:
-// verify github signature on webhook
-// move config vars to env + defaults (webhook secret, github token, port)
-// use versioned dependencies
-// set max number of urls from env to prevent abuse
-// add some comments
-//
