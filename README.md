@@ -21,4 +21,4 @@ mvdan.cc/xurls
 - use versioned dependencies
 - set max number of urls from env to prevent abuse
 - add some comments to code
-- add `go test`
+- add unit tests for `go test`
